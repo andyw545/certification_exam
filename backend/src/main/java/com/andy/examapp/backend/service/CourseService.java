@@ -1,10 +1,11 @@
 package com.andy.examapp.backend.service;
 
-import com.andy.examapp.backend.domain.Course;
-import com.andy.examapp.backend.repository.CourseRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.andy.examapp.backend.domain.Course;
+import com.andy.examapp.backend.repository.CourseRepository;
 
 @Service
 public class CourseService {
@@ -33,6 +34,7 @@ public class CourseService {
         existing.setCode(updated.getCode());
         existing.setTitle(updated.getTitle());
         existing.setDescription(updated.getDescription());
+        existing.setActive(updated.isActive());
         return courseRepository.save(existing);
     }
 

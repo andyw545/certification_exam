@@ -1,4 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+
 <BorderPane fx:controller="com.andy.examapp.MainController"
+            xmlns="http://javafx.com/javafx/17.0.2"
             xmlns:fx="http://javafx.com/fxml">
 
     <!-- Sidebar Navigation -->

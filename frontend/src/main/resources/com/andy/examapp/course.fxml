@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.andy.examapp.CourseController"
+      spacing="20" alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20"/>
+    </padding>
+
+    <Label text="Courses" style="-fx-font-size: 20;"/>
+
+    <!-- Form Input -->
+    <HBox spacing="10">
+        <TextField fx:id="codeField" promptText="Code"/>
+        <TextField fx:id="titleField" promptText="Title"/>
+        <TextField fx:id="descriptionField" promptText="Description"/>
+        <Button text="Add" onAction="#addCourse"/>
+    </HBox>
+
+    <!-- Refresh Button -->
+    <Button text="Load Courses" onAction="#loadCourses"/>
+
+    <!-- Table View -->
+    <TableView fx:id="coursesTable" prefWidth="700">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="colCode" text="Code" prefWidth="120"/>
+            <TableColumn fx:id="colTitle" text="Title" prefWidth="200"/>
+            <TableColumn fx:id="colDescription" text="Description" prefWidth="230"/>
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="80"/>
+            <TableColumn fx:id="colToggle" text="Action" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <Button text="View Details" onAction="#openDetailsModal"/>
+
+</VBox>

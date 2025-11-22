@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.andy.examapp.CourseDetailsController"
+      spacing="15" alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20"/>
+    </padding>
+
+    <Label text="Course Details" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="codeField" promptText="Course Code"/>
+    <TextField fx:id="titleField" promptText="Title"/>
+    <TextArea fx:id="descriptionField" promptText="Description" prefRowCount="4"/>
+
+    <HBox spacing="10">
+        <Button text="Edit" onAction="#enableEditing"/>
+        <Button text="Save" onAction="#saveChanges"/>
+        <Button text="Close" onAction="#closeModal"/>
+    </HBox>
+
+</VBox>
