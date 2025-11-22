@@ -3,6 +3,7 @@ package com.andy.examapp.backend.web;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ import com.andy.examapp.backend.web.dto.EnrollmentStatusUpdateRequest;
 
 @RestController
 @RequestMapping("/api/enrollments")
-@CrossOrigin // so JavaFX (different origin) can access if needed
+@CrossOrigin
 public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
@@ -27,9 +28,18 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
+    @GetMapping
+    public List<Enrollment> getAllEnrollments() {
+        return enrollmentService.getAllEnrollments();
+    }
+
     @PostMapping
-    public Enrollment enroll(@RequestBody EnrollmentRequest request) {
-        return enrollmentService.enroll(request.getParticipantId(), request.getCourseId());
+    public List<Enrollment> enroll(@RequestBody EnrollmentRequest request) {
+        return enrollmentService.enrollMultiple(
+                request.getParticipantId(),
+                request.getCourseIds(),
+                request.getStatus()
+        );
     }
 
     @PatchMapping("/status")
@@ -50,4 +60,12 @@ public class EnrollmentController {
     public List<Enrollment> getByCourse(@PathVariable Long courseId) {
         return enrollmentService.getByCourse(courseId);
     }
+
+    @DeleteMapping("/{participantId}/{courseId}")
+    public void deleteEnrollment(
+            @PathVariable Long participantId,
+            @PathVariable Long courseId) {
+        enrollmentService.deleteEnrollment(participantId, courseId);
+    }
+
 }

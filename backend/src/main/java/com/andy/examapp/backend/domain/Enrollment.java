@@ -3,6 +3,7 @@ package com.andy.examapp.backend.domain;
 import java.time.LocalDateTime;
 
 import com.andy.examapp.backend.domain.enums.EnrollmentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -17,6 +18,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "enrollments")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Enrollment {
 
     @EmbeddedId
@@ -49,23 +51,17 @@ public class Enrollment {
 
     // Getters & setters
     public EnrollmentId getId() { return id; }
-
     public void setId(EnrollmentId id) { this.id = id; }
 
     public Participant getParticipant() { return participant; }
-
     public void setParticipant(Participant participant) { this.participant = participant; }
 
     public Course getCourse() { return course; }
-
     public void setCourse(Course course) { this.course = course; }
 
     public EnrollmentStatus getStatus() { return status; }
-
     public void setStatus(EnrollmentStatus status) { this.status = status; }
 
     public LocalDateTime getEnrolledAt() { return enrolledAt; }
-
     public void setEnrolledAt(LocalDateTime enrolledAt) { this.enrolledAt = enrolledAt; }
 }
-

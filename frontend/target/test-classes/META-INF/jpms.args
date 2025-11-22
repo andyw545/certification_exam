@@ -1,0 +1,4 @@
+--patch-module
+com.andy.examapp=_
+--add-reads
+com.andy.examapp=ALL-UNNAMED
