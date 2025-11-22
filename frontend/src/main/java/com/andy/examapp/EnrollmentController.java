@@ -17,10 +17,12 @@ import com.google.gson.reflect.TypeToken;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -45,21 +47,34 @@ public class EnrollmentController {
     private TableColumn<Enrollment, String> colStatus;
     @FXML
     private TableColumn<Enrollment, String> colDate;
+    @FXML
+    private TableColumn<Enrollment, String> colAction;
+
+    @FXML
+    private ComboBox<Participant> filterParticipantBox;
+    @FXML
+    private ComboBox<Course> filterCourseBox;
 
     private final Gson gson = new Gson();
     private final HttpClient client = HttpClient.newHttpClient();
     private final String BASE_URL = "http://localhost:8080/api";
 
+    // keep full list for filtering
+    private List<Enrollment> fullEnrollmentList;
+
     @FXML
     public void initialize() {
         statusBox.getItems().addAll("ENROLLED", "WITHDRAWN", "COMPLETED");
 
+        // enable multi-select on course list
         courseList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         setupTable();
         loadParticipants();
         loadCourses();
         loadEnrollments();
+
+        setupFilterListeners();
     }
 
     private void setupTable() {
@@ -78,20 +93,40 @@ public class EnrollmentController {
         colDate.setCellValueFactory(param
                 -> new SimpleStringProperty(param.getValue().getEnrolledAt())
         );
+
+        colAction.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("Delete");
+
+            {
+                btn.setOnAction(e -> {
+                    Enrollment item = getTableView().getItems().get(getIndex());
+                    deleteEnrollment(item);
+                });
+            }
+
+            @Override
+            protected void updateItem(String val, boolean empty) {
+                super.updateItem(val, empty);
+                setGraphic(empty ? null : btn);
+            }
+        });
     }
 
     private void loadParticipants() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/participants"))
-                    .GET().build();
+                    .GET()
+                    .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            Type type = new TypeToken<List<Participant>>() {
+
+            Type listType = new TypeToken<List<Participant>>() {
             }.getType();
-            List<Participant> participants = gson.fromJson(response.body(), type);
+            List<Participant> participants = gson.fromJson(response.body(), listType);
 
             participantBox.getItems().setAll(participants);
+            filterParticipantBox.getItems().setAll(participants);
 
         } catch (Exception e) {
             showAlert("Error loading participants: " + e.getMessage());
@@ -102,14 +137,17 @@ public class EnrollmentController {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/courses"))
-                    .GET().build();
+                    .GET()
+                    .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            Type type = new TypeToken<List<Course>>() {
+
+            Type listType = new TypeToken<List<Course>>() {
             }.getType();
-            List<Course> courses = gson.fromJson(response.body(), type);
+            List<Course> courses = gson.fromJson(response.body(), listType);
 
             courseList.getItems().setAll(courses);
+            filterCourseBox.getItems().setAll(courses);
 
         } catch (Exception e) {
             showAlert("Error loading courses: " + e.getMessage());
@@ -120,14 +158,17 @@ public class EnrollmentController {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/enrollments"))
-                    .GET().build();
+                    .GET()
+                    .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             Type type = new TypeToken<List<Enrollment>>() {
             }.getType();
-            List<Enrollment> enrollments = gson.fromJson(response.body(), type);
+            fullEnrollmentList = gson.fromJson(response.body(), type);
 
-            enrollmentTable.getItems().setAll(enrollments);
+            enrollmentTable.getItems().setAll(fullEnrollmentList);
+
+            applyFilters();
 
         } catch (Exception e) {
             showAlert("Error loading enrollments: " + e.getMessage());
@@ -190,4 +231,64 @@ public class EnrollmentController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
         alert.show();
     }
+
+    private void deleteEnrollment(Enrollment enrollment) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/enrollments/"
+                            + enrollment.getId().getParticipantId() + "/"
+                            + enrollment.getId().getCourseId()))
+                    .DELETE()
+                    .build();
+
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            loadEnrollments();
+            showAlert("Enrollment removed.");
+
+        } catch (Exception e) {
+            showAlert("Error deleting enrollment: " + e.getMessage());
+        }
+    }
+
+    private void applyFilters() {
+
+        if (fullEnrollmentList == null || fullEnrollmentList.isEmpty()) {
+            return;
+        }
+
+        Participant selectedParticipant = filterParticipantBox.getValue();
+        Course selectedCourse = filterCourseBox.getValue();
+
+        List<Enrollment> filtered = fullEnrollmentList; // <-- IMPORTANT: use full list
+
+        if (selectedParticipant != null) {
+            filtered = filtered.stream()
+                    .filter(en -> en.getParticipant().getId().equals(selectedParticipant.getId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+        }
+
+        if (selectedCourse != null) {
+            filtered = filtered.stream()
+                    .filter(en -> en.getCourse().getId().equals(selectedCourse.getId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+        }
+
+        enrollmentTable.getItems().setAll(filtered);
+    }
+
+    private void setupFilterListeners() {
+        filterParticipantBox.setOnAction(e -> applyFilters());
+        filterCourseBox.setOnAction(e -> applyFilters());
+    }
+
+    @FXML
+    private void resetFilters() {
+        filterParticipantBox.setValue(null);
+        filterCourseBox.setValue(null);
+        enrollmentTable.getItems().setAll(fullEnrollmentList);
+    }
+
 }

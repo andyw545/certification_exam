@@ -15,17 +15,16 @@
     </padding>
 
     <Label text="Enroll Participant to Course" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-
     <ComboBox fx:id="participantBox" promptText="Select Participant" prefWidth="300"/>
-    
     <ListView fx:id="courseList" prefHeight="150" prefWidth="300"/>
-    
     <ComboBox fx:id="statusBox" promptText="Status" prefWidth="300"/>
-
     <Button text="Enroll" onAction="#handleEnroll" prefWidth="150"/>
-
+    <HBox spacing="10">
+        <ComboBox fx:id="filterParticipantBox" promptText="Filter by Participant" prefWidth="200"/>
+        <ComboBox fx:id="filterCourseBox" promptText="Filter by Course" prefWidth="200"/>
+        <Button text="Reset Filters" onAction="#resetFilters"/>
+    </HBox>
     <Label text="Existing Enrollments:" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-
     <TableView fx:id="enrollmentTable" prefHeight="300" prefWidth="600">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
@@ -33,6 +32,7 @@
             <TableColumn fx:id="colCourse" text="Course" prefWidth="150"/>
             <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
             <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
+            <TableColumn fx:id="colAction" text="Action" prefWidth="100"/>
         </columns>
     </TableView>
 
