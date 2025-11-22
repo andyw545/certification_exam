@@ -1,13 +1,17 @@
 package com.andy.examapp.backend.service;
 
-import com.andy.examapp.backend.domain.*;
-import com.andy.examapp.backend.domain.enums.EnrollmentStatus;
-import com.andy.examapp.backend.repository.EnrollmentRepository;
-import com.andy.examapp.backend.repository.ParticipantRepository;
-import com.andy.examapp.backend.repository.CourseRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.andy.examapp.backend.domain.Course;
+import com.andy.examapp.backend.domain.Enrollment;
+import com.andy.examapp.backend.domain.EnrollmentId;
+import com.andy.examapp.backend.domain.Participant;
+import com.andy.examapp.backend.domain.enums.EnrollmentStatus;
+import com.andy.examapp.backend.repository.CourseRepository;
+import com.andy.examapp.backend.repository.EnrollmentRepository;
+import com.andy.examapp.backend.repository.ParticipantRepository;
 
 @Service
 public class EnrollmentService {
@@ -17,8 +21,8 @@ public class EnrollmentService {
     private final CourseRepository courseRepository;
 
     public EnrollmentService(EnrollmentRepository enrollmentRepository,
-                             ParticipantRepository participantRepository,
-                             CourseRepository courseRepository) {
+            ParticipantRepository participantRepository,
+            CourseRepository courseRepository) {
         this.enrollmentRepository = enrollmentRepository;
         this.participantRepository = participantRepository;
         this.courseRepository = courseRepository;
@@ -27,6 +31,9 @@ public class EnrollmentService {
     public Enrollment enroll(Long participantId, Long courseId) {
         Participant participant = participantRepository.findById(participantId)
                 .orElseThrow(() -> new IllegalArgumentException("Participant not found: " + participantId));
+        if (!participant.isActive()) {
+            throw new RuntimeException("Participant is disabled and cannot be enrolled.");
+        }
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found: " + courseId));
 

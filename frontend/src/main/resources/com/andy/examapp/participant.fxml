@@ -33,6 +33,8 @@
             <TableColumn fx:id="colName" text="Name" prefWidth="160"/>
             <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
             <TableColumn fx:id="colPhone" text="Phone" prefWidth="150"/>
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+            <TableColumn fx:id="colToggle" text="Action" prefWidth="120"/>
         </columns>
 
     </TableView>

@@ -26,7 +26,6 @@ public class ParticipantDetailsController {
         emailField.setText(participant.getEmail());
         phoneField.setText(participant.getPhone());
 
-        // Start in read-only mode
         nameField.setEditable(false);
         phoneField.setEditable(false);
     }

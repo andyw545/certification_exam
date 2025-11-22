@@ -7,7 +7,7 @@
 <VBox spacing="15" alignment="TOP_CENTER"
       xmlns="http://javafx.com/javafx/8.0.171"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.andy.examapp.ParticipantDetailController">
+      fx:controller="com.andy.examapp.ParticipantDetailsController">
 
     <padding>
         <Insets top="20" left="20" right="20" bottom="20"/>

@@ -11,13 +11,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-public class PrimaryController {
+public class ParticipantController {
 
     private final Gson gson = new Gson();
 
@@ -31,6 +33,10 @@ public class PrimaryController {
     private TableColumn<Participant, String> colEmail;
     @FXML
     private TableColumn<Participant, String> colPhone;
+    @FXML
+    private TableColumn<Participant, Boolean> colStatus;
+    @FXML
+    private TableColumn<Participant, Void> colToggle;
 
     @FXML
     private TextField nameField;
@@ -45,6 +51,48 @@ public class PrimaryController {
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        colStatus.setCellFactory(column -> new TableCell<Participant, Boolean>() {
+            @Override
+            protected void updateItem(Boolean active, boolean empty) {
+                super.updateItem(active, empty);
+
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(active ? "Active" : "Disabled");
+                    // Optional: color style
+                    setStyle(active ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+                }
+            }
+        });
+
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("active"));
+        colToggle.setCellFactory(param -> new TableCell<>() {
+            private final Button actionBtn = new Button();
+
+            {
+                actionBtn.setOnAction(event -> {
+                    Participant p = getTableView().getItems().get(getIndex());
+                    toggleStatus(p);
+
+                    p.setActive(!p.isActive());
+                    actionBtn.setText(p.isActive() ? "Disable" : "Activate");
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Participant p = getTableView().getItems().get(getIndex());
+                    actionBtn.setText(p.isActive() ? "Disable" : "Activate");
+                    setGraphic(actionBtn);
+                }
+            }
+        });
     }
 
     @FXML
@@ -109,7 +157,7 @@ public class PrimaryController {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("participant_detail.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("participant_details.fxml"));
             Parent root = loader.load();
 
             ParticipantDetailsController controller = loader.getController();
@@ -128,4 +176,12 @@ public class PrimaryController {
         }
     }
 
+    private void toggleStatus(Participant participant) {
+        try {
+            ApiClient.put("/participants/" + participant.getId() + "/toggle-status", "{}");
+            loadParticipants();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

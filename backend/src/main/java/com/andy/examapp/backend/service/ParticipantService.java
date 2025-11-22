@@ -1,10 +1,11 @@
 package com.andy.examapp.backend.service;
 
-import com.andy.examapp.backend.domain.Participant;
-import com.andy.examapp.backend.repository.ParticipantRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.andy.examapp.backend.domain.Participant;
+import com.andy.examapp.backend.repository.ParticipantRepository;
 
 @Service
 public class ParticipantService {
@@ -33,6 +34,7 @@ public class ParticipantService {
         existing.setName(updated.getName());
         existing.setEmail(updated.getEmail());
         existing.setPhone(updated.getPhone());
+        existing.setActive(updated.isActive());
         return participantRepository.save(existing);
     }
 
